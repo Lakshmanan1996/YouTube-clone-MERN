@@ -1,16 +1,15 @@
-FROM node
+FROM node:20-alpine
 
 WORKDIR /app/backend
 
-COPY . /app/backend/
+# Copy only package files first (layer caching)
+COPY package*.json ./
 
-RUN npm install
+RUN npm install --only=production
 
-ENV DB_user=value
-ENV DB_password=value
-ENV DB_name=value
-ENV SECRET_KEY=value
-ENV EMAIL=value
-ENV PASSWORD=value
+# Copy app source
+COPY . .
+
+EXPOSE 5000
 
 CMD ["node", "server.js"]
