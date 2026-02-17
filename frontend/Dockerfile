@@ -1,11 +1,12 @@
-FROM node
+FROM node:20-alpine AS build
 
-WORKDIR /app/frontend
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
-COPY . /app/frontend/
-
-RUN npm install && npm run build
-
-EXPOSE 4000
-
-CMD [ "npm", "run", "preview" ]
+FROM nginx:alpine
+COPY --from=build /app/build /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx","-g","daemon off;"]
